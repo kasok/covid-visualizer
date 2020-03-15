@@ -36,7 +36,7 @@ function logme($data){
 	// print_r($data);
 	
 	$csv = $data['data'];
-	print_r($csv);
+	//print_r($csv);
 	file_put_contents('data/przypadki_'.date('Y-m-d_His').'.csv',$csv);
 	logme('zapisalem csv');
 	

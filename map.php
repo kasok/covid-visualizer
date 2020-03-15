@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="leaflet-1.6.0/leaflet.css" />
 <script src="leaflet-1.6.0/leaflet.js"></script>
 <style type="text/css">
-	#map { width: 100%; height: 80%; }
+	#map { width: 800px; height: 600px;margin:auto; }
 	body { font: 16px/1.4 "Helvetica Neue", Arial, sans-serif; }
 	.ghbtns { position: relative; top: 4px; margin-left: 5px; }
 	a { color: #0077ff; }
@@ -24,15 +24,15 @@
 <script type="text/javascript"><?= renderDataScript(); ?></script>
 <script>
 
-var map = L.map('map').setView([52, 19], 6.5);
+var map = L.map('map').setView([52, 22], 5.5);
 
-var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+var tiles = L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
 addressPoints = addressPoints.map(function (p) { return [p[0], p[1], p[2]]; });
 
-var heat = L.heatLayer(addressPoints, {max: 0.8, radius: 25, blur: 25}).addTo(map);
+var heat = L.heatLayer(addressPoints, {max: 0.008, radius: 25, blur: 15, gradient: {0.4: 'blue', 0.65: 'navy'}}).addTo(map);
 var markers = {};
 <?php renderMarkerScript(); ?>
 

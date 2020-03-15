@@ -1,6 +1,43 @@
 <?php
 header('Content-Type:text/html; charset=UTF-8');
-echo('<h1>Mapa zakażeń COVID-19 w Polsce</h1>');
+?>
+<html>
+
+
+<head>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" sizes="32x32" href="virus.png">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="COVID-19 PL">
+<link rel="apple-touch-icon" href="/virus-192.png">
+<link rel="apple-touch-startup-image" href="/virus-192.png">
+<link rel="apple-touch-icon-precomposed" sizes="192x192" href="/virus-192.png" />
+<meta name="viewport" content="initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>COVID-19 w Polsce - gdziewirus.eu</title>
+<meta name="keywords" content="koronawirus,polska,covid,mapa,przypadki,oficjalne" />
+<meta name="description" content="Aktualna mapa przypadków koronawirusa COVID-19 w Polsce" />
+<meta property="og:title" content="COVID-19 w Polsce - gdziewirus.eu" />
+<meta property="og:image" content="virus-192.png" />
+<meta property="og:image:width" content="192″ />
+<meta property="og:image:height" content="192″ />
+<meta property="og:url" content="https://gdziewirus.eu" />
+<meta property="og:description" content="Aktualna mapa przypadków koronawirusa COVID-19 w Polsce" />
+
+</head>
+<body>
+<style type="text/css">
+body{
+	background: rgb(223,246,254);
+	background: radial-gradient(circle, rgba(223,246,254,1) 0%, rgba(197,223,233,1) 100%);
+}
+h1, h2, h3, h4, h5{
+	margin:auto; text-align:center;
+	font-family: Century Gothic, Verdana, Helvetica, Arial;
+}
+</style>
+<?php
+echo('<h2>COVID-19 w Polsce</h2>');
 
 // --------------------get CASES---------------------
 $filelist = glob('data/przypadki_*');
@@ -74,7 +111,7 @@ function renderDataScript(){
 	//echo(file_get_contents('Leaflet.heat-gh-pages/realworld.10000.js'));
 }
 function renderHtmlBubble($p){
-	return sprintf('<h2>woj.: %s - powiat: %s</h2><hr /><h3>Przypadków: %d<br />Zgonów: %d</h3>',
+	return sprintf('<h2>woj.: %s<br />powiat: %s</h2><hr /><h3>Przypadków: %d<br />Zgonów: %d</h3>',
 		$p[0], $p[1], $p[2], $p[3]
 	
 	);
@@ -95,7 +132,9 @@ function renderMarkerScript(){
 	}
 	echo( $js_str ); 
 }
-printf('<h2>Razem potwierdzonych zarażeń: %d, razem zgonów: %d</h2>', $total_cases, $total_deceased);
+printf('<h3>Razem zakażeń: %d, razem zgonów: %d</h3>', $total_cases, $total_deceased);
+echo('<button style="height:30px;" onclick="window.location.reload();">Odśwież</button>');
+echo('<h4>kliknij ikonę na mapie, aby zobaczyć szczegóły, dodaj stronę do ekranu głównego swego telefonu, żeby być na bieżąco</h4>');
 require('map.php');
 $updata = explode('_',str_replace(array('data/przypadki_','.csv'),'',$plik_przypadki));
 $updata[1] = substr($updata[1],0,2).':'.substr($updata[1],2,2).':'.substr($updata[1],4,2);
@@ -103,5 +142,7 @@ $updata = $updata[0].' '.$updata[1];
 echo('<hr/>
 Źródło danych: <a href="https://gov.pl/web/koronawirus/wykaz-zarazen-koronawirusem-sars-cov-2" target="_blank">https://gov.pl/web/koronawirus/wykaz-zarazen-koronawirusem-sars-cov-2</a><br />
 Zachorowania na świecie: <a target="_blank" href="https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6">link</a><br />
-ostatnia aktualizacja: '.$updata.'<br />opr. Kacper Sokołowski <img src="logo.svg" style="position:relative;top:3px;" width="60px" /><br />zgłoszenia awarii: jamjest[at]gmail.com, +48696700130'
+ostatnia aktualizacja: '.$updata.'<br />opr. Kacper Sokołowski, <!--firma <img src="logo.svg" style="position:relative;top:3px;" width="60px" />--><br />zgłoszenia awarii: jamjest[at]gmail.com, +48696700130'
 );
+
+echo('</body>');

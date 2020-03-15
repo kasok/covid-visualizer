@@ -1,0 +1,20 @@
+{
+  "name": "COVID PL",
+  "icons": [
+
+
+    {
+      "src": "./virus.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+	{
+      "src": "./virus-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary"
+}
