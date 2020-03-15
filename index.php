@@ -142,7 +142,9 @@ $updata = $updata[0].' '.$updata[1];
 echo('<hr/>
 Źródło danych: <a href="https://gov.pl/web/koronawirus/wykaz-zarazen-koronawirusem-sars-cov-2" target="_blank">https://gov.pl/web/koronawirus/wykaz-zarazen-koronawirusem-sars-cov-2</a><br />
 Zachorowania na świecie: <a target="_blank" href="https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6">link</a><br />
-ostatnia aktualizacja: '.$updata.'<br />opr. Kacper Sokołowski, <!--firma <img src="logo.svg" style="position:relative;top:3px;" width="60px" />--><br />zgłoszenia awarii: jamjest[at]gmail.com, +48696700130'
+ostatnia aktualizacja: '.$updata.'<br />opr. Kacper Sokołowski, <!--firma <img src="logo.svg" style="position:relative;top:3px;" width="60px" />--><br />zgłoszenia awarii: jamjest[at]gmail.com, +48696700130<br />
+Wyświetlana lokalizacja przypadku to przybliżenie geometrycznego środka powiatu na podstawie danych konturowych Głównego Urzędu Geodezji i Kartografii.
+'
 );
 
 echo('</body>');
