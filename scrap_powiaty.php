@@ -1,4 +1,4 @@
-<?php
+<?php exit();
 
 include("proj4php/vendor/autoload.php");
 use proj4php\Proj4php;

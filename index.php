@@ -12,7 +12,7 @@ header('Content-Type:text/html; charset=UTF-8');
 <link rel="apple-touch-icon" href="/virus-192.png">
 <link rel="apple-touch-startup-image" href="/virus-192.png">
 <link rel="apple-touch-icon-precomposed" sizes="192x192" href="/virus-192.png" />
-<meta name="viewport" content="initial-scale=1">
+<meta name="viewport" content="initial-scale=0.75">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>COVID-19 w Polsce - gdziewirus.eu</title>
 <meta name="keywords" content="koronawirus,polska,covid,mapa,przypadki,oficjalne" />
@@ -34,6 +34,10 @@ body{
 h1, h2, h3, h4, h5{
 	margin:auto; text-align:center;
 	font-family: Century Gothic, Verdana, Helvetica, Arial;
+}
+.leaflet-div-icon{
+	background:none !important;
+	border:none !important;
 }
 </style>
 <?php
@@ -68,27 +72,76 @@ for($i=0;$i<count($powiaty);$i++)
 
 $przypadki_proc = array();
 
-for($i=0;$i<count($przypadki);$i++)
+if(basename($plik_przypadki) < 'przypadki_2020-03-17_180002.csv')
 {
-	$row = $przypadki[$i];
-	if($row[4] === 'Id')
-		continue;
-	if($row[4] === 't0000')
+	for($i=0;$i<count($przypadki);$i++)
 	{
+		$row = $przypadki[$i];
+		if($row[4] === 'Id')
+			continue;
+		if($row[4] === 't0000')
+		{
+			
+			$total_cases = $row[2];
+			$total_deceased = $row[3];
+			continue;
+			
+		}
 		
-		$total_cases = $row[2];
-		$total_deceased = $row[3];
-		continue;
+		$teryt = str_replace('t','',$row[4]);
+		
+		$coords = [50,20]; //środek Polski
+		
+		//                id powiatu       woj    powiat         przypadki        zgony             latitude                   longitude
+		$przypadki_proc[ $teryt ] = array($row[0],$row[1],intval($row[2]), intval($row[3]), $powiaty_wspolrz[$teryt][0], $powiaty_wspolrz[$teryt][1] ); 
 		
 	}
-	
-	$teryt = str_replace('t','',$row[4]);
-	
-	$coords = [50,20]; //środek Polski
-	
-	//                id powiatu       woj    powiat         przypadki        zgony             latitude                   longitude
-	$przypadki_proc[ $teryt ] = array($row[0],$row[1],intval($row[2]), intval($row[3]), $powiaty_wspolrz[$teryt][0], $powiaty_wspolrz[$teryt][1] ); 
-	
+
+}
+else
+{
+	for($i=0;$i<count($przypadki);$i++)
+	{
+		$row = $przypadki[$i];
+		if($row[3] === 'Id')
+			continue;
+		if($row[3] === 't00')
+		{
+			
+			$total_cases = $row[1];
+			$total_deceased = $row[2];
+			continue;
+			
+		}
+		
+		$woj2pow = array(
+		'12' => '1261',
+		'02' => '0264',
+		'16' => '1661',
+		'06' => '0663',
+		'08' => '0862',
+		'22' => '2261',
+		'10' => '1061',
+		'30' => '3064',
+		'24' => '2469',
+		'32' => '3262',
+		'26' => '2661',
+		'14' => '1465',
+		'18' => '1863',
+		'20' => '2061',
+		'28' => '2862',
+		'04' => '0461');
+
+		
+		
+		$teryt = $woj2pow[str_replace('t','',$row[3])];
+		
+		$coords = [50,20]; //środek Polski
+		
+		//                id powiatu       woj    powiat         przypadki        zgony             latitude                   longitude
+		$przypadki_proc[ $teryt ] = array($row[0],''    ,intval($row[1]), intval($row[2]), $powiaty_wspolrz[$teryt][0], $powiaty_wspolrz[$teryt][1] ); 
+		
+	}
 }
 
 //print_r($przypadki_proc);
@@ -104,14 +157,17 @@ function renderDataScript(){
 	$js_str = '';
 	$js_str .= 'var addressPoints = [';
 	foreach($przypadki_proc as $teryt => $przypadek)
-		$js_str.='['.$przypadek[4].', '.$przypadek[5].', '.sprintf('%0.4f',$przypadek[2]*100/$total_cases ).'],';
+	{
+		$ms = $przypadek[2]*2;
+		$js_str.='['.$przypadek[4].', '.$przypadek[5].', '.sprintf('%0.4f',$ms ).'],';
+	}
 	$js_str=substr($js_str,0,-1);
 	$js_str .='];';
 	echo($js_str);
 	//echo(file_get_contents('Leaflet.heat-gh-pages/realworld.10000.js'));
 }
 function renderHtmlBubble($p){
-	return sprintf('<h2>woj.: %s<br />powiat: %s</h2><hr /><h3>Przypadków: %d<br />Zgonów: %d</h3>',
+	return sprintf('<h2>woj.: %s<br /><!--powiat: %s</h2>--><hr /><h3>Przypadków: %d<br />Zgonów: %d</h3>',
 		$p[0], $p[1], $p[2], $p[3]
 	
 	);
@@ -122,12 +178,15 @@ function renderMarkerScript(){
 	global $przypadki_proc;
 	foreach($przypadki_proc as $teryt => $przypadek)
 	{
+		$ms = 28*log($przypadek[2]+1, 5)+8;
+		
 		$js_str .= sprintf('markers[%d] = L.marker([%0.6f, %0.6f], {
 			title: "%s",
-			icon: L.icon({iconUrl: \'virus.png\', iconSize: [%d, %d]})
+			/* icon: L.icon({iconUrl: \'virus.png\', iconSize: [d, d]}) */
+			icon: L.divIcon({html: "<div style=\"background:url(\'virus2.png\') no-repeat;background-size:100%% 100%%;height:%dpx;width:%dpx;color:white;position:relative;top:-%dpx;left:-%dpx;text-align:center;line-height:%dpx\"><p>%d/%d</p></div>"})
 		  }).addTo(map);
 
-		  markers[%d].bindPopup("%s");', $teryt, $przypadek[4], $przypadek[5], 'empty', 32*sqrt($przypadek[2])/2, 32*sqrt($przypadek[2])/2, $teryt, renderHtmlBubble($przypadek));
+		  markers[%d].bindPopup("%s");', $teryt, $przypadek[4], $przypadek[5], '', $ms, $ms, $ms/2, $ms/2, $ms,$przypadek[2],$przypadek[3], $teryt, renderHtmlBubble($przypadek));
 		  
 	}
 	echo( $js_str ); 
@@ -142,8 +201,10 @@ $updata = $updata[0].' '.$updata[1];
 echo('<hr/>
 Źródło danych: <a href="https://gov.pl/web/koronawirus/wykaz-zarazen-koronawirusem-sars-cov-2" target="_blank">https://gov.pl/web/koronawirus/wykaz-zarazen-koronawirusem-sars-cov-2</a><br />
 Zachorowania na świecie: <a target="_blank" href="https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6">link</a><br />
-ostatnia aktualizacja: '.$updata.'<br />opr. Kacper Sokołowski, <!--firma <img src="logo.svg" style="position:relative;top:3px;" width="60px" />--><br />zgłoszenia awarii: jamjest[at]gmail.com, +48696700130<br />
-Wyświetlana lokalizacja przypadku to przybliżenie geometrycznego środka powiatu na podstawie danych konturowych Głównego Urzędu Geodezji i Kartografii.
+ostatnia aktualizacja automatyczna: '.$updata.'<br />opr. Kacper Sokołowski, <!--firma <img src="logo.svg" style="position:relative;top:3px;" width="60px" />--><br />zgłoszenia awarii: jamjest[at]gmail.com, +48696700130<br />
+<!-- Wyświetlana lokalizacja przypadku to przybliżenie geometrycznego środka powiatu na podstawie danych konturowych Głównego Urzędu Geodezji i Kartografii. -->
+Ze względu na zmianę formatu danych dostarczanych przez Ministerstwo Zdrowia, dokładność ograniczona jest co do województwa.<br />
+Kod źródłowy ninejszej witryny dostępny jest pod adresem <a href="https://github.com/kasok/covid-visualizer" target="_blank">https://github.com/kasok/covid-visualizer</a>
 '
 );
 
